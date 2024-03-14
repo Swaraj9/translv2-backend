@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx nodemon index.js",
+    "build-python": "cd python && pip install -r requirements.txt -t .",
+    "build": "npm install && npm run build-python"
   },
   "keywords": [],
   "author": "",

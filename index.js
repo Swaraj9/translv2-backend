@@ -66,7 +66,7 @@ app.post('/filetranslate', upload.single('file'), async (req, res) => {
 }
 );
 
-app.post( '/fileimg' , upload.single('img'), async (req, res) => {
+app.post('/fileimg' , upload.single('img'), async (req, res) => {
     try {
     const image = req.file;
 
