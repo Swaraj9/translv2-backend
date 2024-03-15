@@ -46,17 +46,21 @@ app.post("/filetranslate", upload.single("file"), async (req, res) => {
     if (!file) {
       return res.status(400).send("No file uploaded.");
     }
+    const fromLang = "en"
+    const toLang = "hi"
     console.log(file);
     if (file.mimetype == "application/pdf") {
       let dataBuffer = file.buffer;
       pdfParse(dataBuffer).then((result) => {
         console.log(result.text);
+        translateText(fromLang, toLang, result.text, res);
       });
     } else {
       const extractor = new WordExtractor();
       const extracted = extractor.extract(file.buffer);
       extracted.then((doc) => {
         console.log(doc.getBody());
+        translateText(fromLang, toLang, doc.getBody(), res);
       });
     }
   } catch (error) {
@@ -68,7 +72,8 @@ app.post("/filetranslate", upload.single("file"), async (req, res) => {
 app.post("/fileimg", upload.single("img"), async (req, res) => {
   try {
     const image = req.file;
-
+    const fromLang = "en"
+    const toLang = "hi"
     if (!image) {
       return res.status(400).json({ error: "Image data not provided" });
     }
@@ -80,6 +85,7 @@ app.post("/fileimg", upload.single("img"), async (req, res) => {
       .recognize(image.buffer, "eng")
       .then((text) => {
         console.log("Result:", text.data.text);
+        translateText(fromLang, toLang, text.data.text, res);
       })
       .catch((error) => {
         console.log(error.message);
@@ -97,6 +103,8 @@ app.post("/fileimg", upload.single("img"), async (req, res) => {
 app.post("/fileaudio", upload.single("audio"), async (req, res) => {
   try {
     const audio = req.file;
+    const fromLang = "en"
+    const toLang = "hi"
     if (!audio) {
       return res.status(400).json({ error: "audio data not provided" });
     }
@@ -110,10 +118,7 @@ app.post("/fileaudio", upload.single("audio"), async (req, res) => {
           return res.status(500).send("Internal Server Error");
         }
         console.log("Python script output:", stdout);
-        res.status(200).send({
-          // result: `Translated data from ${source} to ${target}`
-          pythonOutput: stdout,
-        });
+        translateText(fromLang, toLang, stdout, res);
       }
     );
   } catch (error) {
