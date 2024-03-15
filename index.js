@@ -25,11 +25,18 @@ app.get("/", (req, res) => {
 
 app.post( '/translate' , (req,res) => {
 
-    const { source, target, data } = req.body;
-    console.log(data);
-    res.status(200).send({
-        result: `Translated ${data} from ${source} to ${target}`
-    })
+    const { fromLang, toLang, inputText } = req.body;
+    
+    exec(`python ./python/translation.py ${fromLang} ${toLang} ${inputText}`, (error, stdout, stderr) => {
+        if (error) {
+            console.error('Error executing Python script:', error);
+            return res.status(500).send('Internal Server Error');
+        }
+        res.status(200).send({
+            // result: `Translated data from ${source} to ${target}`
+            pythonOutput: stdout
+        });
+    });
 }
 );
 
