@@ -1,24 +1,32 @@
-ARG NODE_VERSION=21.6.0
-
-FROM node:${NODE_VERSION}-alpine
+FROM ubuntu:22.04
 
 # Install Python, Tesseract, and build dependencies
-RUN apk add --no-cache \
-    python3 \
-    py3-pip \
-    tesseract-ocr \
-    tesseract-ocr-dev \
-    gcc \
-    g++ \
-    libstdc++ \
-    python3-dev \
-    swig \
-    libgomp \
-    git
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3 \
+        python3-pip \
+        tesseract-ocr \
+        python3.10-venv \
+        libtesseract-dev \
+        gcc \
+        g++ \
+        libgomp1 \
+        git \
+        build-essential \
+        cmake \
+        wget \
+        unzip \
+        nodejs \
+        npm \
+        libgl1 \
+        && rm -rf /var/lib/apt/lists/*
 
 # Create and activate a virtual environment
 RUN python3 -m venv /usr/src/venv
 ENV PATH="/usr/src/venv/bin:$PATH"
+
+# Install srt package
+RUN pip install srt ultralytics
 
 # Download and install vosk model
 RUN wget https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip && \
@@ -31,17 +39,12 @@ RUN git clone https://github.com/alphacep/vosk-api && \
     cd vosk-api/python && \
     python3 setup.py install
 
+# Install OpenCV and other Python dependencies
 RUN pip install --upgrade pip setuptools wheel
-# RUN pip install opencv-python==4.3.0.38
-# RUN pip install numpy==1.26.4
-# Install additional Python dependencies
-RUN pip install pytesseract \
-               transformers \
-               translate
+RUN pip install opencv-python pytesseract transformers translate
 
 # Use production node environment by default.
 ENV NODE_ENV production
-
 WORKDIR /usr/src/app
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
@@ -54,7 +57,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     npm ci --omit=dev
 
 # Run the application as a non-root user.
-USER node
+# USER node
 
 # Copy the rest of the source files into the image.
 COPY . .

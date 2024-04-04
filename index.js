@@ -127,6 +127,32 @@ app.post("/fileaudio", upload.single("audio"), async (req, res) => {
   }
 });
 
+app.post("/braille", upload.single("img"), async (req, res) => {
+  try {
+    // const image = req.file;
+    // if (!image) {
+    //   return res.status(400).json({ error: "Image data not provided" });
+    // }
+    // console.log(image);
+
+    exec(
+      "python ./python/braille.py ./python/models/yolov8m.pt ./python/test/testbraille.jpg ./python/test/output.jpg",
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error("Error executing Python script:", error);
+          return res.status(500).send("Internal Server Error");
+        }
+        const imageData = fs.readFileSync("./python/test/output.jpg")
+        const base64Image = Buffer.from(imageData).toString('base64');
+        res.status(200).send({result:base64Image})
+      }
+    );
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 const port = process.env.PORT || 10000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
