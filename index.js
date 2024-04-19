@@ -136,7 +136,7 @@ app.post("/braille", upload.single("img"), async (req, res) => {
     // console.log(image);
 
     exec(
-      "python ./python/braille.py ./python/models/yolov8m.pt ./python/test/testbraille.jpg ./python/test/output.jpg",
+      "python ./python/braille.py ./python/models/yolov8m.pt ./python/test/testbraille.jpg ./python/test/",
       (error, stdout, stderr) => {
         if (error) {
           console.error("Error executing Python script:", error);

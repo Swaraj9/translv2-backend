@@ -44,7 +44,7 @@ model = YOLO(sys.argv[1])
 img = cv2.imread(sys.argv[2])
 
 results = model(img)
-
+outx = 0
 for result in results:
     boxes = result.boxes
     for box in boxes:
@@ -53,7 +53,10 @@ for result in results:
         x1, y1, x2, y2 = box.xyxy[0]
         x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
         print(f"Label: {box.cls}, Confidence: {box.conf.item():.2f}, Bounding Box: ({x1}, {y1}) ({x2}, {y2})")
+        cropped_image = img[y1:y2, x1:x2]
+        cv2.imwrite(sys.argv[3]+str(outx)+'.jpg',cropped_image)
+        outx += 1
         cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
         cv2.putText(img, letter, (x1-1, y1-4), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
-cv2.imwrite(sys.argv[3],img)
+cv2.imwrite(sys.argv[3]+'output.jpg',img)
