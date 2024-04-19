@@ -4,3 +4,5 @@ opencv-python
 transformers
 translate
 ultralytics
+torch
+torchvision

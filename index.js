@@ -134,9 +134,10 @@ app.post("/braille", upload.single("img"), async (req, res) => {
     //   return res.status(400).json({ error: "Image data not provided" });
     // }
     // console.log(image);
-
+    // const imageBuffer = image.buffer;
+    // fs.writeFileSync('./python/test/testbraille.jpg', imageBuffer);
     exec(
-      "python ./python/braille.py ./python/models/yolov8m.pt ./python/test/testbraille.jpg ./python/test/",
+      "python ./python/braille.py ./python/models/yolov8m.pt ./python/test/testbraille.jpg ./python/test/ ./python/models/best_model.pth",
       (error, stdout, stderr) => {
         if (error) {
           console.error("Error executing Python script:", error);
