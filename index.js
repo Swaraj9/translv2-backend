@@ -143,9 +143,22 @@ app.post("/braille", upload.single("img"), async (req, res) => {
           console.error("Error executing Python script:", error);
           return res.status(500).send("Internal Server Error");
         }
-        const imageData = fs.readFileSync("./python/test/output.jpg")
-        const base64Image = Buffer.from(imageData).toString('base64');
-        res.status(200).send({result:base64Image})
+        // const imageData = fs.readFileSync("./python/test/output.jpg")
+        // const base64Image = new Blob([imageData], { type: 'image/jpeg' });
+        // // const base64Image = Buffer.from(imageData).toString('base64');
+        // const imageURL = URL.createObjectURL(base64Image);
+        // console.log(imageURL)
+        // res.status(200).send({result:base64Image})
+        fs.readFile('./python/test/output.jpg', (err, data) => {
+          if (err) {
+            console.error('Error reading file:', err);
+            res.status(500).send('Error reading file');
+            return;
+          }
+      
+          res.setHeader('Content-Type', 'image/jpeg');
+          res.send(data);
+        });
       }
     );
   } catch (error) {
