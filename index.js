@@ -10,6 +10,8 @@ const tesseract = require("tesseract.js");
 require("dotenv").config();
 const fetch = require("node-fetch");
 const { exec } = require("child_process");
+const WavEncoder = require('wav').Encoder;
+const BufferStream = require('bufferstream');
 
 app.use(cors());
 app.use(express.json());
@@ -110,7 +112,26 @@ app.post("/fileaudio", upload.single("audio"), async (req, res) => {
     }
     console.log(audio);
     const audioBuffer = audio.buffer;
-    fs.writeFileSync('./python/test.wav', audioBuffer);
+
+    const bufferStream = new BufferStream();
+    bufferStream.end(audioBuffer);
+    const fileStream = fs.createWriteStream('./python/test.wav');
+
+    const wavEncoder = new WavEncoder({
+      channels: 1,                
+      sampleRate: 44100,          
+      bitDepth: 16                
+    });
+
+    bufferStream.pipe(wavEncoder).pipe(fileStream);
+
+    fileStream.on('error', err => {
+      console.error('Error writing WAV file:', err);
+    });
+
+    fileStream.on('finish', () => {
+      console.log('WAV file written successfully.');
+    });
     exec(
       "python ./python/stt.py ./python/test.wav",
       (error, stdout, stderr) => {
