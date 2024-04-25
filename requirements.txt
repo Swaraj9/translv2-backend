@@ -1,0 +1,6 @@
+vosk
+pytesseract
+opencv-python
+transformers
+translate
+ultralytics
