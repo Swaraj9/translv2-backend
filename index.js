@@ -113,25 +113,18 @@ app.post("/fileaudio", upload.single("audio"), async (req, res) => {
     console.log(audio);
     const audioBuffer = audio.buffer;
 
-    const bufferStream = new BufferStream();
-    bufferStream.end(audioBuffer);
-    const fileStream = fs.createWriteStream('./python/test.wav');
-
-    const wavEncoder = new WavEncoder({
-      channels: 1,                
-      sampleRate: 44100,          
-      bitDepth: 16                
+    const wavFile = new wav.FileWriter({
+      sampleRate: 44100,  
+      bitDepth: 16,       
+      channels: 1         
     });
-
-    bufferStream.pipe(wavEncoder).pipe(fileStream);
-
-    fileStream.on('error', err => {
-      console.error('Error writing WAV file:', err);
+  
+    wavFile.on('finish', () => {
+      console.log('WAV file written successfully');
     });
+    wavFile.pipe(fs.createWriteStream('./python/test.wav'));
+    wavFile.write(audioBuffer);
 
-    fileStream.on('finish', () => {
-      console.log('WAV file written successfully.');
-    });
     exec(
       "python ./python/stt.py ./python/test.wav",
       (error, stdout, stderr) => {
