@@ -121,11 +121,11 @@ app.post("/fileaudio", upload.single("audio"), async (req, res) => {
     wavFile.on('finish', () => {
       console.log('WAV file written successfully');
     });
-    wavFile.pipe(fs.createWriteStream('./python/test.wav'));
+    wavFile.pipe(fs.createWriteStream('test.wav'));
     wavFile.write(audioBuffer);
 
     exec(
-      "python ./python/stt.py ./python/test.wav",
+      "python ./python/stt.py ./test.wav",
       (error, stdout, stderr) => {
         if (error) {
           console.error("Error executing Python script:", error);
