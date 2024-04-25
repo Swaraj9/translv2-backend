@@ -24,11 +24,13 @@ const translateText = (fromLang, toLang, inputText, res) => {
             console.error('Error executing Python script:', error);
             return res.status(500).send('Internal Server Error');
         }
+        console.log(stdout)
         res.status(200).send({
             translatedText: stdout
         });
     });
 }
+
 
 app.get("/", (req, res) => {
   res.status(201).json({ message: "Connected to Backend!" });
