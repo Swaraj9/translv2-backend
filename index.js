@@ -10,8 +10,7 @@ const tesseract = require("tesseract.js");
 require("dotenv").config();
 const fetch = require("node-fetch");
 const { exec } = require("child_process");
-const WavEncoder = require('wav').Encoder;
-const BufferStream = require('bufferstream');
+const wav = require('wav');
 
 app.use(cors());
 app.use(express.json());
