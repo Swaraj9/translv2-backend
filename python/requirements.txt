@@ -2,7 +2,8 @@ vosk
 pytesseract
 opencv-python
 transformers
-translate
+mtranslate
+
 ultralytics
 torch
 torchvision

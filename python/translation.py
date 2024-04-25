@@ -1,10 +1,18 @@
-from translate import Translator
+from mtranslate import translate
 import sys
 
-#Langs: en, hi, mr, gu, ta, te, bn
-fromLang, toLang, inp = sys.argv[1], sys.argv[2], sys.argv[3]
+INDIC = ["as", "bn", "gu", "hi", "kn", "ml", "mr", "or", "pa", "ta", "te"]
 
-translator= Translator(from_lang= fromLang, to_lang= toLang)
-translation = translator.translate(inp)
+def translate_to_indic(text, target_language, source_language):
+    try:
+        translated_text = translate(text, target_language, source_language)
+        return translated_text
+    except Exception as e:
+        return str(e)
+    
+text_to_translate = sys.argv[3]
+fromLang = sys.argv[1]
+toLang = sys.argv[2]
 
-sys.stdout.buffer.write(translation.encode('utf8'))
+translated_text = translate_to_indic(text_to_translate, toLang, fromLang)
+sys.stdout.buffer.write(translated_text.encode('utf-8'))
