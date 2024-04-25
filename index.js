@@ -93,9 +93,7 @@ app.post("/fileimg", upload.single("img"), async (req, res) => {
         console.log(error.message);
       });
 
-    res.status(200).send({
-      // result: `Translated data from ${source} to ${target}`
-    });
+  
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -111,7 +109,8 @@ app.post("/fileaudio", upload.single("audio"), async (req, res) => {
       return res.status(400).json({ error: "audio data not provided" });
     }
     console.log(audio);
-
+    const audioBuffer = audio.buffer;
+    fs.writeFileSync('./python/test.wav', audioBuffer);
     exec(
       "python ./python/stt.py ./python/test.wav",
       (error, stdout, stderr) => {
@@ -131,13 +130,13 @@ app.post("/fileaudio", upload.single("audio"), async (req, res) => {
 
 app.post("/braille", upload.single("img"), async (req, res) => {
   try {
-    // const image = req.file;
-    // if (!image) {
-    //   return res.status(400).json({ error: "Image data not provided" });
-    // }
-    // console.log(image);
-    // const imageBuffer = image.buffer;
-    // fs.writeFileSync('./python/test/testbraille.jpg', imageBuffer);
+    const image = req.file;
+    if (!image) {
+      return res.status(400).json({ error: "Image data not provided" });
+    }
+    console.log(image);
+    const imageBuffer = image.buffer;
+    fs.writeFileSync('./python/test/testbraille.jpg', imageBuffer);
     exec(
       "python ./python/braille.py ./python/models/yolov8m.pt ./python/test/testbraille.jpg ./python/test/ ./python/models/best_model.pth",
       (error, stdout, stderr) => {
