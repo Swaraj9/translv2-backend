@@ -3,4 +3,4 @@ pytesseract
 opencv-python
 transformers
 argostranslate
-translate
+mtranslate

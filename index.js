@@ -19,16 +19,19 @@ app.use(express.json());
 const upload = multer();
 
 const translateText = (fromLang, toLang, inputText, res) => {
-    exec(`python ./python/translation.py ${fromLang} ${toLang} "${inputText}"`, (error, stdout, stderr) => {
-        if (error) {
-            console.error('Error executing Python script:', error);
-            return res.status(500).send('Internal Server Error');
-        }
-        res.status(200).send({
-            translatedText: stdout
-        });
-    });
-}
+  exec(
+    `python ./python/translation.py ${fromLang} ${toLang} "${inputText}"`,
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error("Error executing Python script:", error);
+        return res.status(500).send("Internal Server Error");
+      }
+      res.status(200).send({
+        translatedText: stdout,
+      });
+    }
+  );
+};
 
 app.get("/", (req, res) => {
   res.status(201).json({ message: "Connected to Backend!" });
