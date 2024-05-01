@@ -11,6 +11,7 @@ require("dotenv").config();
 const fetch = require("node-fetch");
 const { exec } = require("child_process");
 const wav = require('wav');
+const bodyParser = require('body-parser');
 
 app.use(cors());
 app.use(express.json());
@@ -43,14 +44,23 @@ app.post("/translate", (req, res) => {
   translateText(fromLang, toLang, inputText, res);
 });
 
-app.post("/filetranslate", upload.single("file"), async (req, res) => {
+app.post("/filetranslate", upload.fields([
+  { name: 'file', maxCount: 1 },
+  { name: 'source' },
+  { name: 'target' }
+]), async (req, res) => {
   try {
-    const file = req.file;
+    const { source, target } = req.body;
+    console.log("Source:", source);
+    console.log("Target:", target);
+
+    const file = req.files.file ? req.files.file[0] : null;
+    const fromLang = source;
+    const toLang = target;
     if (!file) {
       return res.status(400).send("No file uploaded.");
     }
-    const fromLang = "en"
-    const toLang = "hi"
+    
     console.log(file);
     if (file.mimetype == "application/pdf") {
       let dataBuffer = file.buffer;
@@ -72,18 +82,26 @@ app.post("/filetranslate", upload.single("file"), async (req, res) => {
   }
 });
 
-app.post("/fileimg", upload.single("img"), async (req, res) => {
+app.post("/fileimg", upload.fields([
+  { name: 'img', maxCount: 1 },
+  { name: 'source' },
+  { name: 'target' }
+]), async (req, res) => {
   try {
-    const image = req.file;
-    const fromLang = "en"
-    const toLang = "hi"
+    const { source, target } = req.body;
+    console.log("Source:", source);
+    console.log("Target:", target);
+
+    const image = req.files.img ? req.files.img[0] : null;
+    const fromLang = source;
+    const toLang = target;
+
     if (!image) {
       return res.status(400).json({ error: "Image data not provided" });
     }
+
     console.log(image);
 
-    // const img = fs.readFileSync("../python/test/ocr3.jpeg")
-    // console.log(img)
     tesseract
       .recognize(image.buffer, "eng")
       .then((text) => {
@@ -93,19 +111,25 @@ app.post("/fileimg", upload.single("img"), async (req, res) => {
       .catch((error) => {
         console.log(error.message);
       });
-
-  
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
   }
 });
 
-app.post("/fileaudio", upload.single("audio"), async (req, res) => {
+app.post("/fileaudio", upload.fields([
+  { name: 'audio', maxCount: 1 },
+  { name: 'source' },
+  { name: 'target' }
+]), async (req, res) => {
   try {
-    const audio = req.file;
-    const fromLang = "en";
-    const toLang = "hi";
+    const { source, target } = req.body;
+    console.log("Source:", source);
+    console.log("Target:", target);
+
+    const audio = req.files.audio ? req.files.audio[0] : null;
+    const fromLang = source;
+    const toLang = target;
     if (!audio) {
       return res.status(400).json({ error: "audio data not provided" });
     }
