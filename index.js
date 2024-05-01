@@ -104,37 +104,33 @@ app.post("/fileimg", upload.single("img"), async (req, res) => {
 app.post("/fileaudio", upload.single("audio"), async (req, res) => {
   try {
     const audio = req.file;
-    const fromLang = "en"
-    const toLang = "hi"
+    const fromLang = "en";
+    const toLang = "hi";
     if (!audio) {
       return res.status(400).json({ error: "audio data not provided" });
     }
     console.log(audio);
-    const audioBuffer = audio.buffer;
 
-    const wavFile = new wav.FileWriter({
-      sampleRate: 44100,  
-      bitDepth: 16,       
-      channels: 1         
-    });
-  
-    wavFile.on('finish', () => {
+    const tempFilePath = `${__dirname}/temp_audio_${Date.now()}.wav`;
+
+    const wavFileStream = fs.createWriteStream(tempFilePath);
+    wavFileStream.write(audio.buffer);
+    wavFileStream.end();
+
+    wavFileStream.on('finish', () => {
       console.log('WAV file written successfully');
-    });
-    wavFile.pipe(fs.createWriteStream('test.wav'));
-    wavFile.write(audioBuffer);
 
-    exec(
-      "python ./python/stt.py ./test.wav",
-      (error, stdout, stderr) => {
+      exec(`python ./python/stt.py ${tempFilePath}`, (error, stdout, stderr) => {
         if (error) {
           console.error("Error executing Python script:", error);
           return res.status(500).send("Internal Server Error");
         }
         console.log("Python script output:", stdout);
         translateText(fromLang, toLang, stdout, res);
-      }
-    );
+
+        fs.unlinkSync(tempFilePath);
+      });
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
